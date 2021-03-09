@@ -143,6 +143,11 @@ public class JUnitPublisher implements Runnable {
             }
         }).filter(Objects::nonNull).collect(Collectors.toMap(JUnitTestSuite::getName, Function.identity(), throwingMerger(), LinkedHashMap::new));
         List<JUnitTestCase> jUnitTestCases = jUnitTestSuites.values().stream().flatMap(ts -> ts.getTestCases() != null ? ts.getTestCases().stream() : Stream.empty()).collect(Collectors.toList());
+        for (JUnitTestCase jtc:jUnitTestCases){
+          if(jtc.getClassName() == null)
+            jtc.setClassName("automated-tests");
+        }
+
         Map<String, List<JUnitTestCase>> jUnitTestCaseMap = jUnitTestCases.stream().map(JUnitTestCase::getClassName).distinct().map(className -> new AbstractMap.SimpleEntry<>(className, jUnitTestCases.stream().filter(tc -> tc.getClassName().equals(className)).collect(Collectors.toList()))).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, throwingMerger(), LinkedHashMap::new));
 
         Map<String, TestRailSection> testRailSectionMap = new LinkedHashMap<>(jUnitTestCaseMap.size());
